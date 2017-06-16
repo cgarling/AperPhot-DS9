@@ -1,0 +1,15 @@
+#Bind photometry command
+Aperture Photometry
+*.fits
+bind p
+#echo "$x $y" | $text
+#$filename | python ds9_phot.py | $text
+
+#python ds9_phot.py $filename(full)
+#echo "python ds9_phot.py $filename(full|full,base)" | $text
+
+#test out the most recent libraries from  pip
+#/opt/local/bin/venv/bin/python /opt/local/bin/ds9_phot.py | $text
+
+#default
+python /opt/local/bin/ds9_phot.py | $text

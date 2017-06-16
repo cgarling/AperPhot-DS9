@@ -1,0 +1,23 @@
+First initialize the directory:
+git init
+
+add the repository,
+git remote add origin <url>
+
+any new files I make: 
+git add <filename>
+
+commit things to be changed pre push
+git commit -m "message"
+
+I set up my remote with the name bitbucket so that
+
+git push bitbucket master
+is the correct syntax, or replace master with other branch. use -u to remember the last command. 
+
+you need to add files to the commit, so every time you want to commit you have to use git add, or you can do 
+git commit -a -m "message" 
+to commit all changed files
+
+now I'll make a new branch called hw1, 
+switch into this branch using git checkout <branchname>
