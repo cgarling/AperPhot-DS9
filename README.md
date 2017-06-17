@@ -10,7 +10,7 @@ Within the phot.ds9 file, you can change the installation location of the analys
 
 If you choose a different installation directory, you must also alter the first line of ds9_phot.py to reflect this. The supporting file phot\_vars.py must be in the same directory as ds9\_phot.py
 
-### Dependencies
+## Dependencies
 The analysis script requires numpy, scipy, matplotlib, photutils, and pyds9. The analysis script ds9\_phot.py uses Tkinter for graphical display. 
 
 The package was built on Ubuntu 14.04 / 16.04 with package versions:
@@ -30,7 +30,7 @@ Below is a screenshot of the output of the analysis script.
 
 ![Alt text](test.png)
 
-### Usage
+## Usage
 If installed correctly, you can open DS9 from any directory with any .fits file and the script will work properly. Select the crosshair tool from Edit >> Cross in the toolbar and drag the crosshair close to the centroid of the source you want to perform aperture photometry on. Let the crosshair there and press "p". A new window should appear with a zoomed-in image of the source and the radial distribution of pixel counts, with fit Moffat and Gaussian functions, sky background level, and aperture counts. You can change values for the apertures in the boxes in the new window, and these will be remembered from one session to another. 
 
 To examine another source, move the crosshair in the DS9 window, then click back into the Tkinter window and press p again. If you press p while in the DS9 window with the analysis screen still up, DS9 will tell you the analysis task is already running. You should click back into the analysis window before pressing p to analyze a new source. 
