@@ -23,7 +23,7 @@ The package was built on Ubuntu 14.04 / 16.04 with package versions:
 
 After development is mostly complete, I will check compatibility with older versions on another computer.
 
-### Features
+## Features
 The analysis script ds9\_phot.py stars by grabbing data from the crosshair (Edit >> Cross in DS9 toolbar) of DS9 using pyds9, determines the centroid of the source selected, plots the data using zscale from https://github.com/spacetelescope/stsci.numdisplay/blob/master/lib/stsci/numdisplay/zscale.py and plots the apertures used for the photmetry. In an adjacent plot, it shows the radial distribution of pixel counts, with the aperture radii also shown. Also shown are 1D Gaussian and Moffat functions, with the FWHM of the Gaussian fit displayed in the upper right of the window. Sky background and aperture counts are determined using photutils.
 
 Below is a screenshot of the output of the analysis script.
