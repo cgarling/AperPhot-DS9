@@ -29,3 +29,12 @@ The analysis script ds9\_phot.py stars by grabbing data from the crosshair (Edit
 Below is a screenshot of the output of the analysis script.
 
 ![Alt text](test.png)
+
+### Usage
+If installed correctly, you can open DS9 from any directory with any .fits file and the script will work properly. Select the crosshair tool from Edit >> Cross in the toolbar and drag the crosshair close to the centroid of the source you want to perform aperture photometry on. Let the crosshair there and press "p". A new window should appear with a zoomed-in image of the source and the radial distribution of pixel counts, with fit Moffat and Gaussian functions, sky background level, and aperture counts. You can change values for the apertures in the boxes in the new window, and these will be remembered from one session to another. 
+
+To examine another source, move the crosshair in the DS9 window, then click back into the Tkinter window and press p again. If you press p while in the DS9 window with the analysis screen still up, DS9 will tell you the analysis task is already running. You should click back into the analysis window before pressing p to analyze a new source. 
+
+## Upcoming Features
+Planning to add a menu to select between different functions to fit to the radial profile. Currently it shows Gaussian and Moffat functions, but I'm not certain the Moffat function is working right yet. The Gaussian FWHM value should be good, and the fit seems to work. Aperture photometry results seem similar to IDL's ATV, with slight differences arising from how we do background subtraction, I think. 
+I don't plan to add any type of output to text file or anything like that -- I envision this tool being used to check FWHM's and aperture counts while observing or as cursory inspection to new data. 
