@@ -197,9 +197,9 @@ def gauss2d((x, y), amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
                             + c*((y-yo)**2)))
     return g.ravel()
 
-def moffat1d(x,amplitude,xo,gamma,alpha,offset):
+def moffat1d(x,amplitude,xo,alpha,beta,offset):
     #fwhm is 2*gamma
-    return (amplitude*(1.+((x-xo)/gamma)**2.)**-alpha)+offset
+    return (amplitude*(1.+((x-xo)/alpha)**2.)**-beta)+offset
 
 def moffat2d((x,y),amplitude,xo,yo,gamma_x,gamma_y,theta,alpha,offset):
     #amplitude,xo,yo,gamma_x,gamma_y,theta,alpha,offset=float(amplitude),float(xo),float(yo),float(gamma_x),float(gamma_y),float(theta),float(alpha),float(offset)
@@ -246,7 +246,7 @@ def radial_profile(data, center):
 
 def onpress(event):
         if event.key=='p':
-		x=d.get('crosshair physical')
+		x=d.get('crosshair image')
 		x,y=x.split()
 		x,y=int(float(x)),int(float(y))
 
@@ -308,8 +308,14 @@ def onpress(event):
 
                 
 		ax2.scatter(radial[0],radial[1])
-		ax2.plot(np.linspace(0,new_image_halfwidth,num=50),gauss1d(np.linspace(0,new_image_halfwidth,num=50),popt[0],0,np.mean([popt[3],popt[4]]),popt[6]),c='k',lw=2)
-		ax2.text(0.5,0.93,'Gaussian FWHM: '+str(2.35482*np.mean([popt[3],popt[4]]))[:5],transform=ax2.transAxes,fontsize=15)
+                if var10.get()==1:
+			ax2.plot(np.linspace(0,new_image_halfwidth,num=50),gauss1d(np.linspace(0,new_image_halfwidth,num=50),popt[0],0,np.mean([popt[3],popt[4]]),popt[6]),c='k',lw=2)
+			ax2.text(0.5,0.93,'Gaussian FWHM: '+str(2.35482*np.mean([popt[3],popt[4]]))[:5],transform=ax2.transAxes,fontsize=15)
+	    	if var11.get()==1:
+                    	moffat1d_guess=(np.amax(new_image)-bkg_map_med,0,3,1,bkg_map_med)
+		    	popt2,pcov2=curve_fit(moffat1d,radial[0],radial[1],p0=moffat1d_guess)
+			ax2.plot(np.linspace(0,new_image_halfwidth,num=50),moffat1d(np.linspace(0,new_image_halfwidth,num=50),popt2[0],popt2[1],popt2[2],popt2[3],popt2[4]),c='r',lw=2)
+                        ax2.text(0.5,0.85,'Moffat FWHM: '+str(2.0*popt2[2]*np.sqrt(2.0**(1./popt2[3])-1.))[:5],transform=ax2.transAxes,fontsize=15)
 		ax2.grid(True,color='white',linestyle='-',linewidth=1)
 		ax2.set_axisbelow(True)
 		ax2.autoscale(False)
@@ -356,10 +362,10 @@ root=tk.Tk()
 root.title("Aperture Photometry")
 
 label4text = tk.StringVar()
-label4text.set('Half Width of Star Viewing Window')
+label4text.set('Half Width of Star Window')
 label4 = tk.Label(root, textvariable=label4text, height=1)
 label4.config(font=("Verdana", 12))
-label4.grid(row=2,column=0,columnspan=2)
+label4.grid(row=2,column=0,columnspan=1)
 
 entry1=tk.Entry(root)
 entry1.insert(0,str(new_image_halfwidth_default))
@@ -399,6 +405,20 @@ label7=tk.Label(root, textvariable=label7text, height=1)
 label7.config(font=("Verdana", 12))
 label7.grid(row=5,column=0,columnspan=1)
 
+#label10text = tk.StringVar()
+#label10text.set('Gaussian PSF')
+#label10=tk.Label(root,textvariable=label10text,height=1)
+#label10.config(font=("Verdana",12))
+#label10.grid(row=2,column=3,columnspan=1)
+var10 = tk.IntVar()
+var10.set(1)
+tk.Checkbutton(root, text="Gaussian PDF", font=("Verdana",12), variable=var10,command=update).grid(row=2, column=3,columnspan=1)
+
+var11 = tk.IntVar()
+var11.set(1)
+tk.Checkbutton(root, text="Moffat PDF", font=("Verdana",12), variable=var11,command=update).grid(row=2, column=4,columnspan=1)
+
+
 b = tk.Button(root, text="Update Parameters",command=update)#width=15
 b.grid(row=6,column=1)
 
@@ -408,7 +428,7 @@ filename=d.get('file')
 hdu=d.get_pyfits()
 data=hdu[0].data
 
-x=d.get('crosshair physical')
+x=d.get('crosshair image')
 x,y=x.split()
 x,y=int(float(x)),int(float(y))
 
@@ -468,7 +488,9 @@ ax2.plot(np.linspace(0,new_image_halfwidth,num=50),gauss1d(np.linspace(0,new_ima
 #guess=(np.amax(new_image)-new_image[0,0],x,y,3,3,0,new_image[0,0])
 #popt,pcov=curve_fit(gauss2d,(x_grid,y_grid),new_image.ravel(),p0=guess)
 #moffat1d(x,amplitude,xo,gamma,alpha,offset):
-#def moffat2d((x,y),amplitude,xo,yo,gamma_x,gamma_y,theta,alpha,offset):
+#def moffat1d(x,amplitude,xo,alpha,beta,offset):
+    #fwhm is 2*gamma
+    #return (amplitude*(1.+((x-xo)/alpha)**2.)**-beta)+offset
 moffat1d_guess=(np.amax(new_image)-bkg_map_med,0,3,1,bkg_map_med)
 popt2,pcov2=curve_fit(moffat1d,radial[0],radial[1],p0=moffat1d_guess)
 #moffat2d_guess=(np.amax(new_image)-bkg_map_med,x,y,3.0,3.0,10.**-8.,1.,bkg_map_med)
@@ -477,6 +499,7 @@ popt2,pcov2=curve_fit(moffat1d,radial[0],radial[1],p0=moffat1d_guess)
 # plt.plot(radial[0],moffat1d(radial[0],popt2[0],popt2[1],popt2[2],popt2[3],popt2[4]))
 # plt.show()
 ax2.plot(np.linspace(0,new_image_halfwidth,num=50),moffat1d(np.linspace(0,new_image_halfwidth,num=50),popt2[0],popt2[1],popt2[2],popt2[3],popt2[4]),c='r',lw=2)
+ax2.text(0.5,0.85,'Moffat FWHM: '+str(2.0*popt2[2]*np.sqrt(2.0**(1./popt2[3])-1.))[:5],transform=ax2.transAxes,fontsize=15)
 
 ax2.autoscale(False)
 ax2.set_xlim([0,new_image_halfwidth])
@@ -541,6 +564,7 @@ label9text.set('Aperture Counts: '+str(int(phot_table['residual_aperture_sum'][0
 label9=tk.Label(root, textvariable=label9text, height=1)
 label9.config(font=("Verdana", 12))
 label9.grid(row=1,column=4)
+
 #canvas.mpl_connect('motion_notify_event',onmove)
 canvas.mpl_connect('key_press_event',onpress)
 #root.protocol('WM_DELETE_WINDOW',handler)
