@@ -337,6 +337,8 @@ def onpress(event):
 		#print "Aperture Photometry Result: "+str(phot_table['residual_aperture_sum'])
                 label8text.set('Sky Value: '+str(int(bkg_map_med)))
 		label9text.set('Aperture Counts: '+str(int(phot_table['residual_aperture_sum'][0])))
+                label10text.set('Mag: '+str(-2.5*np.log10(int(phot_table['residual_aperture_sum'][0]))+25.)[:5])
+
 
                 
 		ax2.scatter(radial[0],radial[1])
@@ -394,10 +396,12 @@ root=tk.Tk()
 root.title("Aperture Photometry")
 
 label4text = tk.StringVar()
-label4text.set('Half Width of Star Window')
+label4text.set('Window Half Width')
 label4 = tk.Label(root, textvariable=label4text, height=1)
-label4.config(font=("Verdana", 12))
+label4.config(font=("Verdana", int(12*scaling)))
 label4.grid(row=2,column=0,columnspan=1)
+
+#set the width of the entry box column
 
 entry1=tk.Entry(root)
 entry1.insert(0,str(new_image_halfwidth_default))
@@ -405,10 +409,10 @@ entry1.grid(row=2,column=2)
 new_image_halfwidth=int(entry1.get())
 
 label5text = tk.StringVar()
-label5text.set('Aperture Radius (pix)')
+label5text.set('Aperture Radius')
 label5=tk.Label(root, textvariable=label5text, height=1)
-label5.config(font=("Verdana", 12))
-label5.grid(row=3,column=0,columnspan=1)
+label5.config(font=("Verdana", int(12*scaling)))
+label5.grid(row=3,column=0)
 
 entry2=tk.Entry(root)
 entry2.insert(0,str(aperture_radius))
@@ -421,10 +425,10 @@ entry3.grid(row=4,column=2)
 inner_sky_radius=int(entry3.get())
 
 label6text = tk.StringVar()
-label6text.set('Inner Sky Radius (pix)')
+label6text.set('Inner Sky Radius')
 label6=tk.Label(root, textvariable=label6text, height=1)
-label6.config(font=("Verdana", 12))
-label6.grid(row=4,column=0,columnspan=1)
+label6.config(font=("Verdana", int(12*scaling)))
+label6.grid(row=4,column=0)
 
 entry4=tk.Entry(root)
 entry4.insert(0,str(outer_sky_radius))
@@ -432,10 +436,10 @@ entry4.grid(row=5,column=2)
 outer_sky_radius=int(entry4.get())
 
 label7text = tk.StringVar()
-label7text.set('Outer Sky Radius (pix)')
+label7text.set('Outer Sky Radius')
 label7=tk.Label(root, textvariable=label7text, height=1)
-label7.config(font=("Verdana", 12))
-label7.grid(row=5,column=0,columnspan=1)
+label7.config(font=("Verdana", int(12*scaling)))
+label7.grid(row=5,column=0)
 
 #label10text = tk.StringVar()
 #label10text.set('Gaussian PSF')
@@ -444,11 +448,11 @@ label7.grid(row=5,column=0,columnspan=1)
 #label10.grid(row=2,column=3,columnspan=1)
 var10 = tk.IntVar()
 var10.set(1)
-tk.Checkbutton(root, text="Gaussian PDF", font=("Verdana",12), variable=var10,command=update).grid(row=2, column=3,columnspan=1)
+tk.Checkbutton(root, text="Gaussian PDF", font=("Verdana",int(12*scaling)), variable=var10,command=update).grid(row=2, column=3,columnspan=1)
 
 var11 = tk.IntVar()
 var11.set(1)
-tk.Checkbutton(root, text="Moffat PDF", font=("Verdana",12), variable=var11,command=update).grid(row=2, column=4,columnspan=1)
+tk.Checkbutton(root, text="Moffat PDF", font=("Verdana",int(12*scaling)), variable=var11,command=update).grid(row=2, column=4,columnspan=1)
 
 
 b = tk.Button(root, text="Update Parameters",command=update)#width=15
@@ -480,16 +484,16 @@ y=int(popt[2])
 new_image=data[y-new_image_halfwidth:y+new_image_halfwidth,x-new_image_halfwidth:x+new_image_halfwidth]
 
 #plot the star in the image, in zscale
-fig=Figure(figsize=(6,6))
+fig=Figure(figsize=(int(6*scaling),int(6*scaling)))
 ax1=fig.add_axes([0,0,1,1])
 ax1.matshow(new_image,cmap='gray',origin='upper',clim=zscale(new_image),zorder=0)
 ax1.autoscale(False)
-ax1.scatter([popt[1]-x+new_image_halfwidth],[popt[2]-y+new_image_halfwidth],marker='+',s=120,c='k',label='centroid',zorder=1)
-aperture_circle=plt.Circle((popt[1]-x+new_image_halfwidth,popt[2]-y+new_image_halfwidth),radius=aperture_radius,linewidth=3,color='hotpink',fill=False,zorder=2)
+ax1.scatter([popt[1]-x+new_image_halfwidth],[popt[2]-y+new_image_halfwidth],marker='+',s=int(120*scaling),c='k',label='centroid',zorder=1)
+aperture_circle=plt.Circle((popt[1]-x+new_image_halfwidth,popt[2]-y+new_image_halfwidth),radius=aperture_radius,linewidth=3*scaling,color='hotpink',fill=False,zorder=2)
 ax1.add_patch(aperture_circle)
-inner_sky=plt.Circle((popt[1]-x+new_image_halfwidth,popt[2]-y+new_image_halfwidth),radius=inner_sky_radius,linewidth=3,color='lime',fill=False,zorder=2)
+inner_sky=plt.Circle((popt[1]-x+new_image_halfwidth,popt[2]-y+new_image_halfwidth),radius=inner_sky_radius,linewidth=3*scaling,color='lime',fill=False,zorder=2)
 ax1.add_patch(inner_sky)
-outer_sky=plt.Circle((popt[1]-x+new_image_halfwidth,popt[2]-y+new_image_halfwidth),radius=outer_sky_radius,linewidth=3,color='red',fill=False,zorder=2)
+outer_sky=plt.Circle((popt[1]-x+new_image_halfwidth,popt[2]-y+new_image_halfwidth),radius=outer_sky_radius,linewidth=3*scaling,color='red',fill=False,zorder=2)
 ax1.add_patch(outer_sky)
 
 
@@ -510,12 +514,15 @@ bkg_map_med=np.median(bkg_map.background)
 phot_table['residual_aperture_sum']=phot_table['aperture_sum_0']-bkg_map_med*aperture.area()
 #print 'Map sky result: '+str(phot_table['aperture_sum_0']-bkg_map_med*aperture.area())
 #print "Aperture Photometry Result: "+str(phot_table['residual_aperture_sum'])
-fig2=Figure(figsize=(6,6))
+fig2=Figure(figsize=(int(6*scaling),int(6*scaling)))
+fig2.set_facecolor('0.85')
 ax2=fig2.add_axes([0.1,0.1,.9,.9])
-ax2.grid(True,color='white',linestyle='-',linewidth=1)
+ax2.grid(True,color='white',linestyle='-',linewidth=1*scaling)
 ax2.set_axisbelow(True)
 ax2.scatter(radial[0],radial[1])
-ax2.plot(np.linspace(0,new_image_halfwidth,num=50),gauss1d(np.linspace(0,new_image_halfwidth,num=50),popt[0],0,np.mean([popt[3],popt[4]]),popt[6]),c='k',lw=2)
+ax2.plot(np.linspace(0,new_image_halfwidth,num=50),gauss1d(np.linspace(0,new_image_halfwidth,num=50),popt[0],0,np.mean([popt[3],popt[4]]),popt[6]),c='k',lw=2*scaling)
+ax2.tick_params(axis='both',which='major',labelsize=10*scaling)
+
 
 #guess=(np.amax(new_image)-new_image[0,0],x,y,3,3,0,new_image[0,0])
 #popt,pcov=curve_fit(gauss2d,(x_grid,y_grid),new_image.ravel(),p0=guess)
@@ -530,19 +537,19 @@ popt2,pcov2=curve_fit(moffat1d,radial[0],radial[1],p0=moffat1d_guess)
 # plt.scatter(radial[0],radial[1])
 # plt.plot(radial[0],moffat1d(radial[0],popt2[0],popt2[1],popt2[2],popt2[3],popt2[4]))
 # plt.show()
-ax2.plot(np.linspace(0,new_image_halfwidth,num=50),moffat1d(np.linspace(0,new_image_halfwidth,num=50),popt2[0],popt2[1],popt2[2],popt2[3],popt2[4]),c='r',lw=2)
-ax2.text(0.5,0.85,'Moffat FWHM: '+str(2.0*popt2[2]*np.sqrt(2.0**(1./popt2[3])-1.))[:5],transform=ax2.transAxes,fontsize=15)
+ax2.plot(np.linspace(0,new_image_halfwidth,num=50),moffat1d(np.linspace(0,new_image_halfwidth,num=50),popt2[0],popt2[1],popt2[2],popt2[3],popt2[4]),c='r',lw=2*scaling)
+ax2.text(0.5,0.85,'Moffat FWHM: '+str(2.0*popt2[2]*np.sqrt(2.0**(1./popt2[3])-1.))[:5],transform=ax2.transAxes,fontsize=13*scaling)
 
 ax2.autoscale(False)
 ax2.set_xlim([0,new_image_halfwidth])
-ax2.set_xlabel('Radius (Pixels)')
+ax2.set_xlabel('Radius (Pixels)',fontsize=12*scaling)
 ax2.set_ylim([np.amin(radial[1]),np.amax(radial[1])])
-ax2.text(0.5,0.93,'Gaussian FWHM: '+str(2.35482*np.mean([popt[3],popt[4]]))[:5],transform=ax2.transAxes,fontsize=15)
+ax2.text(0.5,0.93,'Gaussian FWHM: '+str(2.35482*np.mean([popt[3],popt[4]]))[:5],transform=ax2.transAxes,fontsize=13*scaling)
 ax2.set_axis_bgcolor('0.85')
-ax2.axvline(aperture_radius,linewidth=2,color='hotpink')
-ax2.axvline(inner_sky_radius,linewidth=2,color='lime')
-ax2.axvline(outer_sky_radius,linewidth=2,color='red')
-ax2.axhline(bkg_map_med,linewidth=2,color='yellow')
+ax2.axvline(aperture_radius,linewidth=2*scaling,color='hotpink')
+ax2.axvline(inner_sky_radius,linewidth=2*scaling,color='lime')
+ax2.axvline(outer_sky_radius,linewidth=2*scaling,color='red')
+ax2.axhline(bkg_map_med,linewidth=2*scaling,color='yellow')
 
 canvas=FigureCanvasTkAgg(fig,master=root)
 plot_widget=canvas.get_tk_widget()
@@ -557,7 +564,7 @@ label0text = tk.StringVar()
 #set label value
 label0text.set('Centroid: ')
 label0 = tk.Label(root, textvariable=label0text, height=1)
-label0.config(font=("Verdana", 12,'bold'))
+label0.config(font=("Verdana", int(12*scaling),'bold'))
 label0.grid(row=1,column=0) #adds the label to the program's grid
 
 
@@ -566,7 +573,7 @@ labeltext = tk.StringVar()
 #set label value
 labeltext.set('X: '+str(x))
 label1 = tk.Label(root, textvariable=labeltext, height=1)
-label1.config(font=("Verdana", 12))
+label1.config(font=("Verdana", int(12*scaling)))
 label1.grid(row=1,column=1) #adds the label to the program's grid
 
 #initialize label object
@@ -574,7 +581,7 @@ label2text = tk.StringVar()
 #set label value
 label2text.set('Y: '+str(y))
 label2 = tk.Label(root, textvariable=label2text, height=1)
-label2.config(font=("Verdana", 12))
+label2.config(font=("Verdana", int(12*scaling)))
 label2.grid(row=1,column=2) #adds the label to the program's grid
 
 #initialize label object
@@ -587,15 +594,21 @@ label2.grid(row=1,column=2) #adds the label to the program's grid
 label8text = tk.StringVar()
 label8text.set('Sky Value: '+str(int(bkg_map_med)))
 label8=tk.Label(root, textvariable=label8text, height=1)
-label8.config(font=("Verdana", 12))
+label8.config(font=("Verdana", int(12*scaling)))
 label8.grid(row=1,column=3)
 
 
 label9text = tk.StringVar()
 label9text.set('Aperture Counts: '+str(int(phot_table['residual_aperture_sum'][0])))
 label9=tk.Label(root, textvariable=label9text, height=1)
-label9.config(font=("Verdana", 12))
+label9.config(font=("Verdana", int(12*scaling)))
 label9.grid(row=1,column=4)
+
+label10text = tk.StringVar()
+label10text.set('Mag: '+str(-2.5*np.log10(int(phot_table['residual_aperture_sum'][0]))+25.)[:5])
+label10=tk.Label(root, textvariable=label10text, height=1)
+label10.config(font=("Verdana", int(12*scaling)))
+label10.grid(row=1,column=5)
 
 #canvas.mpl_connect('motion_notify_event',onmove)
 canvas.mpl_connect('key_press_event',onpress)

@@ -39,6 +39,9 @@ You can toggle the Moffat and Gaussian fits to the radial pixel count distributi
 
 Aperture photometry results seem similar to IDL's ATV, with slight differences, which I believe are the result of slightly differing background subtraction methods.
 
+### Scaling
+In phot_vars.py, one of the entries is scaling. This value is used to change the size of the figures and text throughout the program, which also changes the overall size of the program window. I've had issues at small scaling values likely due to how the geometry I'm using in Tkinter. 0.75 is my preferred value, and the default.
+
 ## Upcoming Features
 Thinking about adding in an instrumental magnitude estimator, although I don't typically use that for anything.
 
