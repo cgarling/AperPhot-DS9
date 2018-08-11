@@ -5,7 +5,7 @@ import numpy as np
 #from astropy.io import fits
 #from astropy.modeling import models,fitting
 import os
-from scipy.optimize import curve_fit
+from scipy.optimize import curve_fit,minimize
 import pyds9
 import matplotlib as mpl
 mpl.use('tkagg')
@@ -15,7 +15,7 @@ from matplotlib.figure import Figure
 import Tkinter as tk
 import math
 from photutils import CircularAperture,CircularAnnulus,aperture_photometry
-from photutils.background import Background2D
+from photutils.background import Background2D,MMMBackground
 
 #to do:
 #1: Add interactive way to change radial profile display, perhaps via menu: need to add Moffat profile, that is default for iraf imexam -r. need to be able to compare.
@@ -264,6 +264,17 @@ def radial_profile(data, center):
     sim = data.flat[ind] # image values sorted by radii
     return sr,sim
 
+def radial_profile_gauss1d_chisquare((x,y,amplitude,sigma_x,sky),image):
+    # x=op_vals[0]
+    # y=op_vals[1]
+    # amplitude=op_vals[2]
+    # if amplitude<0 or sigma_x<0 or sky<0:return 50
+    radial=radial_profile(image,(x,y))
+    # print 0.5*np.sum((radial[1]-gauss1d(radial[0],amplitude,0,sigma_x,sky))**2.)
+    return 0.5*np.sum((radial[1]-gauss1d(radial[0],amplitude,0,sigma_x,sky))**2.)
+    
+    
+
 ###############################################################################
 ###############################################################################
 
@@ -329,7 +340,7 @@ def onpress(event):
 		#new background estimation
 		bkg_mask=np.ma.masked_outside(radial[0].reshape(new_image.shape),inner_sky_radius,outer_sky_radius)
 		bkg_map=Background2D(new_image,tuple(np.array(new_image.shape)/4),mask=bkg_mask.mask,exclude_mesh_method='all')
-		bkg_map_med=np.median(bkg_map.background)
+		bkg_map_med=MMMBackground().calc_background(bkg_map.data)#bkg_map_med=np.median(bkg_map.background)
 		#print 'Map sky mean '+str(bkg_map_med)
 		#bkg_mean=phot_table['aperture_sum_1']/annulus.area()
 		#print 'Aperture sky mean '+str(bkg_mean)
@@ -479,9 +490,16 @@ new_image=data[y-new_image_halfwidth:y+new_image_halfwidth,x-new_image_halfwidth
 x_grid=np.arange(x-new_image_halfwidth,x+new_image_halfwidth,1)
 y_grid=np.arange(y-new_image_halfwidth,y+new_image_halfwidth,1)
 x_grid, y_grid = np.meshgrid(x_grid, y_grid)
-guess=(np.amax(new_image)-new_image[0,0],x,y,3,3,0,new_image[0,0])
+#guess=(np.amax(new_image)-new_image[0,0],x,y,3,3,0,new_image[0,0])
+guess=(np.amax(new_image)-new_image[0,0],x_grid[new_image==np.amax(new_image)][0],y_grid[new_image==np.amax(new_image)][0],3,3,0,new_image[0,0])
 #def gauss2d((x, y), amplitude, xo, yo, sigma_x, sigma_y, theta, offset):
 popt,pcov=curve_fit(gauss2d,(x_grid,y_grid),new_image.ravel(),p0=guess)
+
+#guess=(x,y,np.amax(new_image)-new_image[0,0],3,new_image[0,0])
+#def radial_profile_gauss1d_chisquare((x,y,amplitude,sigma_x,sky),image):
+#popt,pcov=curve_fit(gauss1d,x_grid,radial_profile(new_image,[new_image_halfwidth,new_image_halfwidth]),p0=guess)
+#popt=minimize(radial_profile_gauss1d_chisquare,guess,args=(new_image),options={'maxiter':500},method = 'BFGS',bounds=((0,2*new_image_halfwidth),(0,2*new_image_halfwidth),(0,65534),(0,np.inf),(0,np.inf)))
+
 #print popt
 x=int(popt[1])
 y=int(popt[2])
@@ -511,7 +529,7 @@ phot_table=aperture_photometry(data,[aperture,annulus])
 #new background estimation
 bkg_mask=np.ma.masked_outside(radial[0].reshape(new_image.shape),inner_sky_radius,outer_sky_radius)
 bkg_map=Background2D(new_image,tuple(np.array(new_image.shape)/4),mask=bkg_mask.mask,exclude_mesh_method='all')
-bkg_map_med=np.median(bkg_map.background)
+bkg_map_med=MMMBackground().calc_background(bkg_map.data)#bkg_map_med=np.median(bkg_map.background)
 #print 'Map sky mean '+str(bkg_map_med)
 #bkg_mean=phot_table['aperture_sum_1']/annulus.area()
 #print 'Aperture sky mean '+str(bkg_mean)
